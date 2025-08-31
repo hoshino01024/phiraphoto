@@ -281,71 +281,98 @@
     </div>
 
     <script>
-        let currentChartData = null;
-        let currentImageUrl = null;
-        let currentImageBlob = null;
+let currentChartData = null;
+let currentImageUrl = null;
+let currentImageBlob = null;
 
-        async function getChartImage() {
-            const chartId = document.getElementById('chartId').value.trim();
-            
-            if (!chartId) {
-                showError('请输入有效的谱面ID');
-                return;
-            }
-            
-            showLoading(true);
-            hideError();
-            hideSuccess();
-            hideImage();
-            hideDownload();
-            
-            try {
-                const response = await fetch(`https://phira.5wyxi.com/chart/${chartId}`);
-                
-                if (!response.ok) {
-                    throw new Error(`请求失败: ${response.status}`);
-                }
-                
-                const chartData = await response.json();
-                currentChartData = chartData;
-                
-                if (!chartData.illustration) {
-                    throw new Error('该谱面没有背景图片');
-                }
-                
-                // 先获取图片的Blob数据
-                const imageResponse = await fetch(chartData.illustration);
-                if (!imageResponse.ok) {
-                    throw new Error('图片加载失败');
-                }
-                
-                const imageBlob = await imageResponse.blob();
-                currentImageBlob = imageBlob;
-                
-                // 创建Object URL用于显示
-                const imageUrl = URL.createObjectURL(imageBlob);
-                currentImageUrl = imageUrl;
-                
-                const img = document.getElementById('chartImage');
-                img.src = imageUrl;
-                
-                displayChartInfo(chartData);
-                
-                img.onload = function() {
-                    showLoading(false);
-                    showImage();
-                    showDownload();
-                };
-                
-                img.onerror = function() {
-                    throw new Error('图片显示失败');
-                };
-                
-            } catch (error) {
-                showLoading(false);
-                showError('获取失败: ' + error.message);
-            }
+// 添加重试功能
+async function fetchWithRetry(url, options = {}, retries = 3) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await fetch(url, options);
+            if (response.ok) return response;
+            throw new Error(`HTTP错误: ${response.status}`);
+        } catch (error) {
+            if (i === retries - 1) throw error;
+            await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
         }
+    }
+}
+
+async function getChartImage() {
+    const chartId = document.getElementById('chartId').value.trim();
+    
+    if (!chartId) {
+        showError('请输入有效的谱面ID');
+        return;
+    }
+    
+    showLoading(true);
+    hideError();
+    hideSuccess();
+    hideImage();
+    hideDownload();
+    
+    try {
+        const response = await fetchWithRetry(`https://phira.5wyxi.com/chart/${chartId}`, {
+            headers: {
+                'Accept': 'application/json',
+                'Origin': 'https://phira.moe'
+            },
+            mode: 'cors'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`请求失败: ${response.status} ${response.statusText}`);
+        }
+        
+        const chartData = await response.json();
+        currentChartData = chartData;
+        
+        if (!chartData.illustration) {
+            throw new Error('该谱面没有背景图片');
+        }
+        
+        // 获取图片数据
+        const imageResponse = await fetchWithRetry(chartData.illustration);
+        if (!imageResponse.ok) {
+            throw new Error('图片加载失败');
+        }
+        
+        const imageBlob = await imageResponse.blob();
+        currentImageBlob = imageBlob;
+        
+        // 创建Object URL用于显示
+        const imageUrl = URL.createObjectURL(imageBlob);
+        currentImageUrl = imageUrl;
+        
+        const img = document.getElementById('chartImage');
+        img.src = imageUrl;
+        
+        displayChartInfo(chartData);
+        
+        img.onload = function() {
+            showLoading(false);
+            showImage();
+            showDownload();
+        };
+        
+        img.onerror = function() {
+            throw new Error('图片显示失败');
+        };
+        
+    } catch (error) {
+        showLoading(false);
+        
+        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            showError('网络请求失败，请检查：\n1. 网络连接是否正常\n2. 是否被浏览器安全策略阻止\n3. API服务是否可用');
+        } else {
+            showError('获取失败: ' + error.message);
+        }
+        
+        console.error('详细错误:', error);
+    }
+}
 
         async function downloadImage() {
             if (!currentImageBlob) {
