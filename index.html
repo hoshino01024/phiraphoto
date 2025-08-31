@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phira谱面背景图片查看器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .input-section {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        input[type="number"] {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+        
+        button {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            margin-top: 15px;
+        }
+        
+        .download-btn:hover {
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        
+        .result-section {
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .loading {
+            display: none;
+            font-size: 18px;
+            color: #666;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            display: none;
+            background: #ffe6e6;
+            color: #d63384;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #d63384;
+        }
+        
+        .image-container {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .chart-image {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .chart-image:hover {
+            transform: scale(1.02);
+        }
+        
+        .download-container {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .chart-info {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: left;
+        }
+        
+        .chart-info h3 {
+            color: #4facfe;
+            margin-bottom: 15px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-item {
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9em;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Phira谱面背景查看器</h1>
+            <p>输入谱面ID，查看并下载精美的背景图片</p>
+        </div>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <input type="number" id="chartId" placeholder="请输入谱面ID（例如：12238）" min="1">
+                <button onclick="getChartImage()">获取背景图片</button>
+            </div>
+        </div>
+        
+        <div class="result-section">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                正在加载中，请稍候...
+            </div>
+            
+            <div class="error" id="error"></div>
+            
+            <div class="image-container" id="imageContainer">
+                <img id="chartImage" class="chart-image" alt="谱面背景图片">
+                
+                <div class="download-container" id="downloadContainer">
+                    <button class="download-btn" onclick="downloadImage()">
+                        📥 下载图片
+                    </button>
+                    <p style="margin-top: 10px; color: #666; font-size: 0.9em;">
+                        点击下载按钮保存图片到您的设备
+                    </p>
+                </div>
+                
+                <div class="chart-info" id="chartInfo">
+                    <h3>谱面信息</h3>
+                    <div class="info-grid" id="infoGrid"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 Phira谱面查看器 | 数据来源: phira.5wyxi.com</p>
+        </div>
+    </div>
+
+    <script>
+        let currentChartData = null;
+        let currentImageUrl = null;
+
+        async function getChartImage() {
+            const chartId = document.getElementById('chartId').value.trim();
+            
+            if (!chartId) {
+                showError('请输入有效的谱面ID');
+                return;
+            }
+            
+            showLoading(true);
+            hideError();
+            hideImage();
+            hideDownload();
+            
+            try {
+                const response = await fetch(`https://phira.5wyxi.com/chart/${chartId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`请求失败: ${response.status}`);
+                }
+                
+                const chartData = await response.json();
+                currentChartData = chartData;
+                
+                if (!chartData.illustration) {
+                    throw new Error('该谱面没有背景图片');
+                }
+                
+                const img = document.getElementById('chartImage');
+                img.src = chartData.illustration;
+                currentImageUrl = chartData.illustration;
+                
+                displayChartInfo(chartData);
+                
+                img.onload = function() {
+                    showLoading(false);
+                    showImage();
+                    showDownload();
+                };
+                
+                img.onerror = function() {
+                    throw new Error('图片加载失败');
+                };
+                
+            } catch (error) {
+                showLoading(false);
+                showError('获取失败: ' + error.message);
+            }
+        }
+
+        function downloadImage() {
+            if (!currentImageUrl) {
+                showError('没有可下载的图片');
+                return;
+            }
+            
+            try {
+                // 创建下载链接
+                const link = document.createElement('a');
+                link.href = currentImageUrl;
+                
+                // 生成文件名
+                const chartName = currentChartData?.name ? currentChartData.name.replace(/[^\w\u4e00-\u9fa5]/g, '_') : 'chart';
+                const fileName = `phira_${chartName}_${currentChartData?.id || 'unknown'}.jpg`;
+                
+                link.download = fileName;
+                link.target = '_blank';
+                
+                // 模拟点击下载
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // 显示下载成功提示
+                showDownloadSuccess();
+                
+            } catch (error) {
+                showError('下载失败: ' + error.message);
+            }
+        }
+
+        function showDownloadSuccess() {
+            const downloadBtn = document.querySelector('.download-btn');
+            const originalText = downloadBtn.textContent;
+            
+            // 显示成功提示
+            downloadBtn.textContent = '✅ 下载成功！';
+            downloadBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+            
+            // 3秒后恢复原状
+            setTimeout(() => {
+                downloadBtn.textContent = originalText;
+            }, 3000);
+        }
+
+        function displayChartInfo(data) {
+            const infoGrid = document.getElementById('infoGrid');
+            infoGrid.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">谱面名称</div>
+                    <div class="info-value">${data.name || '未知'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">难度等级</div>
+                    <div class="info-value">${data.level || '未知'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">难度数值</div>
+                    <div class="info-value">${data.difficulty || '未知'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">作曲家</div>
+                    <div class="info-value">${data.composer || '未知'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">谱师</div>
+                    <div class="info-value">${decodeCharter(data.charter)}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">评分</div>
+                    <div class="info-value">${data.rating ? (data.rating * 10).toFixed(1) + '/10' : '未知'}</div>
+                </div>
+            `;
+        }
+        
+        function decodeCharter(charter) {
+            if (!charter) return '未知';
+            try {
+                return atob(charter);
+            } catch {
+                return charter;
+            }
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+        
+        function showImage() {
+            document.getElementById('imageContainer').style.display = 'block';
+        }
+        
+        function hideImage() {
+            document.getElementById('imageContainer').style.display = 'none';
+        }
+        
+        function showDownload() {
+            document.getElementById('downloadContainer').style.display = 'block';
+        }
+        
+        function hideDownload() {
+            document.getElementById('downloadContainer').style.display = 'none';
+        }
+        
+        document.getElementById('chartId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                getChartImage();
+            }
+        });
+
+        // 页面加载时聚焦输入框
+        window.onload = function() {
+            document.getElementById('chartId').focus();
+        };
+    </script>
+</body>
+</html>
