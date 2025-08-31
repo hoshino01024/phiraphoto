@@ -140,6 +140,16 @@
             border-left: 4px solid #d63384;
         }
         
+        .success {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+        
         .image-container {
             display: none;
             margin-top: 20px;
@@ -244,6 +254,7 @@
             </div>
             
             <div class="error" id="error"></div>
+            <div class="success" id="success"></div>
             
             <div class="image-container" id="imageContainer">
                 <img id="chartImage" class="chart-image" alt="谱面背景图片">
@@ -272,6 +283,7 @@
     <script>
         let currentChartData = null;
         let currentImageUrl = null;
+        let currentImageBlob = null;
 
         async function getChartImage() {
             const chartId = document.getElementById('chartId').value.trim();
@@ -283,6 +295,7 @@
             
             showLoading(true);
             hideError();
+            hideSuccess();
             hideImage();
             hideDownload();
             
@@ -300,9 +313,21 @@
                     throw new Error('该谱面没有背景图片');
                 }
                 
+                // 先获取图片的Blob数据
+                const imageResponse = await fetch(chartData.illustration);
+                if (!imageResponse.ok) {
+                    throw new Error('图片加载失败');
+                }
+                
+                const imageBlob = await imageResponse.blob();
+                currentImageBlob = imageBlob;
+                
+                // 创建Object URL用于显示
+                const imageUrl = URL.createObjectURL(imageBlob);
+                currentImageUrl = imageUrl;
+                
                 const img = document.getElementById('chartImage');
-                img.src = chartData.illustration;
-                currentImageUrl = chartData.illustration;
+                img.src = imageUrl;
                 
                 displayChartInfo(chartData);
                 
@@ -313,7 +338,7 @@
                 };
                 
                 img.onerror = function() {
-                    throw new Error('图片加载失败');
+                    throw new Error('图片显示失败');
                 };
                 
             } catch (error) {
@@ -322,19 +347,23 @@
             }
         }
 
-        function downloadImage() {
-            if (!currentImageUrl) {
+        async function downloadImage() {
+            if (!currentImageBlob) {
                 showError('没有可下载的图片');
                 return;
             }
             
             try {
+                // 创建Blob URL用于下载
+                const blobUrl = URL.createObjectURL(currentImageBlob);
+                
                 // 创建下载链接
                 const link = document.createElement('a');
-                link.href = currentImageUrl;
+                link.href = blobUrl;
                 
-                // 生成文件名
-                const chartName = currentChartData?.name ? currentChartData.name.replace(/[^\w\u4e00-\u9fa5]/g, '_') : 'chart';
+                // 生成文件名，强制使用.jpg扩展名
+                const chartName = currentChartData?.name ? 
+                    currentChartData.name.replace(/[^\w\u4e00-\u9fa5]/g, '_') : 'chart';
                 const fileName = `phira_${chartName}_${currentChartData?.id || 'unknown'}.jpg`;
                 
                 link.download = fileName;
@@ -345,26 +374,14 @@
                 link.click();
                 document.body.removeChild(link);
                 
-                // 显示下载成功提示
-                showDownloadSuccess();
+                // 清理URL对象
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+                
+                showSuccess('✅ 下载成功！文件已保存为.jpg格式');
                 
             } catch (error) {
                 showError('下载失败: ' + error.message);
             }
-        }
-
-        function showDownloadSuccess() {
-            const downloadBtn = document.querySelector('.download-btn');
-            const originalText = downloadBtn.textContent;
-            
-            // 显示成功提示
-            downloadBtn.textContent = '✅ 下载成功！';
-            downloadBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
-            
-            // 3秒后恢复原状
-            setTimeout(() => {
-                downloadBtn.textContent = originalText;
-            }, 3000);
         }
 
         function displayChartInfo(data) {
@@ -414,10 +431,22 @@
             const errorDiv = document.getElementById('error');
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
+            hideSuccess();
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            hideError();
         }
         
         function hideError() {
             document.getElementById('error').style.display = 'none';
+        }
+        
+        function hideSuccess() {
+            document.getElementById('success').style.display = 'none';
         }
         
         function showImage() {
