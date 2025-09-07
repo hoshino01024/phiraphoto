@@ -696,7 +696,7 @@
         <div class="tab-content active" id="userTab">
             <div class="input-section">
                 <div class="input-group">
-                    <input type="number" id="userId" placeholder="输入用户ID（例如：1882325）" min="1">
+                    <input type="number" id="userId" placeholder="输入用户ID" min="1">
                     <button onclick="getUserInfo()"><i class="fas fa-search"></i> 查询用户</button>
                 </div>
             </div>
@@ -720,7 +720,7 @@
         <div class="tab-content" id="chartTab">
             <div class="input-section">
                 <div class="input-group">
-                    <input type="number" id="chartId" placeholder="请输入谱面ID（例如：12238）" min="1">
+                    <input type="number" id="chartId" placeholder="请输入谱面ID" min="1">
                     <button onclick="getChartImage()"><i class="fas fa-search"></i> 获取谱面信息</button>
                 </div>
             </div>
@@ -776,7 +776,7 @@
         <div class="tab-content" id="leaderboardTab">
             <div class="input-section">
                 <div class="leaderboard-controls">
-                    <input type="number" id="lbChartId" placeholder="谱面ID（例如 30498）" min="1">
+                    <input type="number" id="lbChartId" placeholder="谱面ID" min="1">
                     <div class="controls-right">
                         <button onclick="fetchLeaderboard()"><i class="fas fa-trophy"></i> 查询排行榜</button>
                         <button class="export-btn ghost-btn" onclick="exportCSV()"><i class="fas fa-download"></i> 导出 CSV</button>
@@ -1546,7 +1546,7 @@
             // 排行榜切换显示模式
             document.getElementById('toggleTop').addEventListener('click', () => {
                 showTopOnly = !showTopOnly;
-                document.getElementById('toggleTop').textContent = showTopOnly ? '只看 Top 10' : '显示全部';
+                document.getElementById('toggleTop').textContent = showTopOnly ? '显示全部' : '只看 Top 10';
                 renderLeaderboard();
             });
             
@@ -1556,7 +1556,7 @@
             });
             
             // 初始化排行榜切换按钮文本
-            document.getElementById('toggleTop').textContent = showTopOnly ? '只看 Top 10' : '显示全部';
+            document.getElementById('toggleTop').textContent = showTopOnly ? '显示全部' : '只看 Top 10';
         });
     </script>
 </body>
