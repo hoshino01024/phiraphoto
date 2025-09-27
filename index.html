@@ -3,672 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phira信息查询中心</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>QQ群信息查询工具</title>
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             min-height: 100vh;
-            padding: 20px;
-            color: #333;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
         
         .container {
-            max-width: 1200px;
             width: 100%;
-            background: white;
-            border-radius: 15px;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
             color: white;
-            padding: 25px 20px;
+            padding: 20px;
             text-align: center;
         }
         
         .header h1 {
-            font-size: 2em;
-            margin-bottom: 8px;
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
         .header p {
-            font-size: 1.1em;
             opacity: 0.9;
+            font-size: 14px;
         }
         
-        .tabs {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .tab {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-        }
-        
-        .tab.active {
-            background: white;
-            border-bottom: 3px solid #4facfe;
-            color: #4facfe;
-        }
-        
-        .tab i {
-            margin-right: 8px;
-        }
-        
-        .tab-content {
-            display: none;
-            padding: 20px;
-        }
-        
-        .tab-content.active {
-            display: block;
+        .content {
+            padding: 25px;
         }
         
         .input-section {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         .input-group {
             display: flex;
-            gap: 10px;
             margin-bottom: 15px;
+            gap: 10px;
         }
         
-        input[type="number"], input[type="text"] {
+        .input-field {
             flex: 1;
-            padding: 15px;
-            border: 2px solid #ddd;
+            position: relative;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5ee;
             border-radius: 8px;
             font-size: 16px;
-        }
-        
-        input[type="number"]:focus, input[type="text"]:focus {
+            transition: all 0.3s;
             outline: none;
-            border-color: #4facfe;
-            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
         }
         
-        button {
-            padding: 15px 25px;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        input:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.2);
+        }
+        
+        .paste-btn {
+            background: #2575fc;
             color: white;
             border: none;
             border-radius: 8px;
+            padding: 0 20px;
             cursor: pointer;
-            font-size: 16px;
+            transition: all 0.3s;
             font-weight: 600;
-            transition: transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
-        button:hover {
+        .paste-btn:hover {
+            background: #1c65e0;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
         }
         
-        button:active {
+        .paste-btn:active {
             transform: translateY(0);
         }
         
-        .download-btn, .export-btn {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            margin-top: 15px;
+        .paste-btn:disabled {
+            background: #a0a0a0;
+            cursor: not-allowed;
+            transform: none;
         }
         
-        .download-btn:hover, .export-btn:hover {
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        .query-btn {
+            width: 100%;
+            background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
-        .ghost-btn {
-            background: #eef2ff;
-            color: #1e40af;
-            border: 1px solid #e2e8f0;
+        .query-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 117, 252, 0.4);
+        }
+        
+        .query-btn:active {
+            transform: translateY(0);
+        }
+        
+        .query-btn:disabled {
+            background: #a0a0a0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
         .result-section {
-            text-align: center;
+            display: none;
+            margin-top: 25px;
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e1e5ee;
+        }
+        
+        .result-header h2 {
+            color: #2575fc;
+            font-size: 20px;
+        }
+        
+        .save-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .save-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+        
+        .result-content {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            color: #2575fc;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        
+        .info-label {
+            width: 120px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .info-value {
+            flex: 1;
+            color: #333;
         }
         
         .loading {
             display: none;
-            color: #666;
-            margin: 20px 0;
+            text-align: center;
+            padding: 20px;
         }
         
         .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #2575fc;
+            border-radius: 50%;
             width: 40px;
             height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #4facfe;
-            border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
         }
         
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
         
         .error {
-            display: none;
-            background: #ffe6e6;
-            color: #d63384;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border-left: 4px solid #d63384;
-        }
-        
-        .success {
-            display: none;
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border-left: 4px solid #28a745;
-        }
-        
-        .user-container, .chart-container, .leaderboard-container {
-            display: none;
-            margin: 20px 0;
-        }
-        
-        /* 用户信息卡片样式 */
-        .user-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .user-header {
-            text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #e1e8ed;
-        }
-        
-        .user-name {
-            font-size: 2em;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #2c3e50;
-        }
-        
-        .user-id {
-            color: #7f8c8d;
-            font-size: 1.1em;
-            margin-bottom: 15px;
-        }
-        
-        .user-badges {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .badge {
-            background: linear-gradient(135deg, #fdbb2d 0%, #ec6ead 100%);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 500;
-        }
-        
-        .user-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        .user-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            text-align: center;
-            transition: transform 0.2s;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .stat-value {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #3498db;
-            margin-bottom: 8px;
-        }
-        
-        .stat-label {
-            color: #7f8c8d;
-            font-size: 0.95em;
-        }
-        
-        .user-details {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-        
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #f1f1f1;
-        }
-        
-        .detail-item:last-child {
-            border-bottom: none;
-        }
-        
-        .detail-label {
-            color: #7f8c8d;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .detail-value {
-            color: #2c3e50;
-            font-weight: 600;
-            text-align: right;
-        }
-        
-        .status-banned {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        
-        .status-normal {
-            color: #2ecc71;
-            font-weight: bold;
-        }
-        
-        /* 谱面信息卡片样式 */
-        .image-container {
-            margin-top: 20px;
-        }
-        
-        .chart-image {
-            max-width: 100%;
-            max-height: 500px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-        
-        .chart-image:hover {
-            transform: scale(1.02);
-        }
-        
-        .download-container {
-            margin-top: 20px;
-        }
-        
-        .chart-info {
-            margin-top: 20px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            text-align: left;
-        }
-        
-        .chart-info h3 {
-            color: #4facfe;
-            margin-bottom: 15px;
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        
-        .info-item {
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-        
-        .info-label {
-            font-weight: 600;
-            color: #666;
-            font-size: 0.9em;
-        }
-        
-        .info-value {
-            font-size: 1.1em;
-            margin-top: 5px;
-        }
-        
-        /* 排行榜样式 */
-        .leaderboard-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .leaderboard-meta {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .leaderboard-info {
-            font-size: 14px;
-            color: #334155;
-            background: #f8fafc;
-            padding: 10px;
-            border-radius: 8px;
-            flex: 1;
-        }
-        
-        .leaderboard-summary {
-            margin-left: auto;
-            color: #64748b;
-            font-size: 14px;
-        }
-        
-        .leaderboard-filter {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .leaderboard-toggle {
-            padding: 10px 15px;
-            border-radius: 6px;
-            background: #f1f5f9;
-            border: 1px solid #e6eef8;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
-        .table-wrap {
-            overflow: auto;
-            border-radius: 8px;
-            border: 1px solid #eef2ff;
-            background: #ffffff;
-            margin-top: 15px;
-            max-height: 500px;
-        }
-        
-        .leaderboard-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 780px;
-        }
-        
-        .leaderboard-table th, .leaderboard-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 14px;
-            color: #0f1724;
-        }
-        
-        .leaderboard-table thead th {
-            background: #fbfdff;
-            position: sticky;
-            top: 0;
-            cursor: pointer;
-            user-select: none;
-        }
-        
-        .leaderboard-table tbody tr:hover {
-            background: #f1f8ff;
-        }
-        
-        .muted-text {
-            color: #64748b;
-            font-size: 13px;
-        }
-        
-        .controls-right {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            font-size: 14px;
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-        }
-        
-        /* 新增谱面信息选项卡样式 */
-        .chart-tabs {
-            display: flex;
-            background: #f8f9fa;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        
-        .chart-tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            background: #e9ecef;
-            color: #6c757d;
-        }
-        
-        .chart-tab.active {
-            background: white;
-            color: #4facfe;
-            box-shadow: 0 -2px 0 #4facfe inset;
-        }
-        
-        .chart-tab-content {
-            display: none;
-        }
-        
-        .chart-tab-content.active {
-            display: block;
-        }
-        
-        /* 标签样式 */
-        .tags-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        
-        .tag {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 500;
-        }
-        
-        /* 评级星星样式 */
-        .rating-stars {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-        }
-        
-        .stars {
-            color: #fdbb2d;
-            font-size: 1.2em;
-        }
-        
-        .rating-value {
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #2c3e50;
-        }
-        
-        .rating-count {
-            color: #7f8c8d;
-            font-size: 0.9em;
-        }
-        
-        /* 状态指示器 */
-        .status-indicators {
-            display: flex;
-            gap: 15px;
-            margin: 15px 0;
-        }
-        
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.9em;
-        }
-        
-        .status-true {
-            color: #28a745;
-        }
-        
-        .status-false {
             color: #dc3545;
-        }
-        
-        /* 描述文本样式 */
-        .description {
-            background: #f8f9fa;
+            text-align: center;
             padding: 15px;
+            background: #f8d7da;
             border-radius: 8px;
-            line-height: 1.6;
-            margin: 15px 0;
-            white-space: pre-line;
+            margin-top: 15px;
+            display: none;
         }
         
-        /* 文件链接样式 */
-        .file-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin: 15px 0;
-        }
-        
-        .file-link {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #4facfe;
-            transition: all 0.2s;
-        }
-        
-        .file-link:hover {
-            background: #e9ecef;
-            transform: translateY(-2px);
-        }
-        
-        /* 时间信息样式 */
-        .time-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin: 15px 0;
-        }
-        
-        .time-item {
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .time-label {
-            font-size: 0.85em;
+        .clipboard-info {
+            font-size: 12px;
             color: #6c757d;
-            margin-bottom: 5px;
+            margin-top: 5px;
+            display: none;
         }
         
-        .time-value {
-            font-weight: 500;
-        }
-        
-        @media (max-width: 768px) {
-            .user-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .user-stats {
-                grid-template-columns: 1fr;
-            }
-            
-            .input-group, .leaderboard-controls {
+        @media (max-width: 600px) {
+            .input-group {
                 flex-direction: column;
             }
             
-            button {
+            .paste-btn {
                 width: 100%;
-            }
-            
-            .tabs {
-                flex-direction: column;
-            }
-            
-            .controls-right {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .leaderboard-meta {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .leaderboard-summary {
-                margin-left: 0;
-            }
-            
-            .chart-tabs {
-                flex-direction: column;
+                justify-content: center;
+                padding: 12px;
             }
         }
     </style>
@@ -676,887 +296,339 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-info-circle"></i> Phira信息查询中心</h1>
-            <p>一站式查询Phira用户信息、谱面背景图片和排行榜</p>
+            <h1>🚀 QQ群信息查询工具</h1>
+            <p>输入QQ群号，获取群详细信息</p>
         </div>
         
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab(0)">
-                <i class="fas fa-user"></i> 用户信息查询
-            </div>
-            <div class="tab" onclick="switchTab(1)">
-                <i class="fas fa-music"></i> 谱面信息查询
-            </div>
-            <div class="tab" onclick="switchTab(2)">
-                <i class="fas fa-trophy"></i> 谱面排行榜
-            </div>
-        </div>
-        
-        <!-- 用户信息查询标签 -->
-        <div class="tab-content active" id="userTab">
+        <div class="content">
             <div class="input-section">
                 <div class="input-group">
-                    <input type="number" id="userId" placeholder="输入用户ID" min="1">
-                    <button onclick="getUserInfo()"><i class="fas fa-search"></i> 查询用户</button>
+                    <div class="input-field">
+                        <input type="text" id="groupNumber" placeholder="请输入QQ群号">
+                    </div>
+                    <button class="paste-btn" id="pasteBtn" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        </svg>
+                        粘贴
+                    </button>
                 </div>
+                <div class="clipboard-info" id="clipboardInfo"></div>
+                <button class="query-btn" id="queryBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                    查询群信息
+                </button>
             </div>
             
-            <div class="result-section">
-                <div class="loading" id="userLoading">
-                    <div class="spinner"></div>
-                    查询中，请稍候...
-                </div>
-                
-                <div class="error" id="userError"></div>
-                <div class="success" id="userSuccess"></div>
-                
-                <div class="user-container" id="userContainer">
-                    <!-- 用户信息将在这里显示 -->
-                </div>
-            </div>
-        </div>
-        
-        <!-- 谱面信息查询标签 -->
-        <div class="tab-content" id="chartTab">
-            <div class="input-section">
-                <div class="input-group">
-                    <input type="number" id="chartId" placeholder="请输入谱面ID" min="1">
-                    <button onclick="getChartImage()"><i class="fas fa-search"></i> 获取谱面信息</button>
-                </div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>正在查询群信息，请稍候...</p>
             </div>
             
-            <div class="result-section">
-                <div class="loading" id="chartLoading">
-                    <div class="spinner"></div>
-                    加载中，请稍候...
+            <div class="error" id="error"></div>
+            
+            <div class="result-section" id="resultSection">
+                <div class="result-header">
+                    <h2>🎯 QQ群详细信息</h2>
+                    <button class="save-btn" id="saveBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        保存数据
+                    </button>
                 </div>
-                
-                <div class="error" id="chartError"></div>
-                <div class="success" id="chartSuccess"></div>
-                
-                <div class="chart-container" id="chartContainer">
-                    <div class="image-container" id="imageContainer">
-                        <img id="chartImage" class="chart-image" alt="谱面背景图片">
-                        
-                        <div class="download-container" id="downloadContainer">
-                            <button class="download-btn" onclick="downloadImage()">
-                                <i class="fas fa-download"></i> 下载图片到相册
-                            </button>
-                            <p style="margin-top: 10px; color: #666; font-size: 0.9em;">
-                                点击下载按钮保存谱面背景图片到您的设备
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <!-- 谱面信息选项卡 -->
-                    <div class="chart-tabs">
-                        <div class="chart-tab active" onclick="switchChartTab(0)">基本信息</div>
-                        <div class="chart-tab" onclick="switchChartTab(1)">详细数据</div>
-                        <div class="chart-tab" onclick="switchChartTab(2)">文件信息</div>
-                    </div>
-                    
-                    <div class="chart-info" id="chartInfo">
-                        <div class="chart-tab-content active" id="basicInfo">
-                            <!-- 基本信息将在这里显示 -->
-                        </div>
-                        
-                        <div class="chart-tab-content" id="detailedInfo">
-                            <!-- 详细信息将在这里显示 -->
-                        </div>
-                        
-                        <div class="chart-tab-content" id="fileInfo">
-                            <!-- 文件信息将在这里显示 -->
-                        </div>
-                    </div>
-                </div>
+                <div class="result-content" id="resultContent"></div>
             </div>
-        </div>
-        
-        <!-- 谱面排行榜标签 -->
-        <div class="tab-content" id="leaderboardTab">
-            <div class="input-section">
-                <div class="leaderboard-controls">
-                    <input type="number" id="lbChartId" placeholder="谱面ID" min="1">
-                    <div class="controls-right">
-                        <button onclick="fetchLeaderboard()"><i class="fas fa-trophy"></i> 查询排行榜</button>
-                        <button class="export-btn ghost-btn" onclick="exportCSV()"><i class="fas fa-download"></i> 导出 CSV</button>
-                    </div>
-                </div>
-                
-                <div class="leaderboard-meta">
-                    <div id="lbStatus" class="leaderboard-info">等待输入谱面ID并点击"查询排行榜"或按 Enter。</div>
-                    <div class="leaderboard-summary" id="lbSummary">—</div>
-                </div>
-                
-                <div class="leaderboard-filter">
-                    <input id="lbFilter" type="text" placeholder="按玩家ID或得分过滤（可选）">
-                    <div class="leaderboard-toggle" id="toggleTop">显示全部</div>
-                </div>
-                
-                <div class="error" id="lbError"></div>
-                
-                <div class="leaderboard-container" id="leaderboardContainer">
-                    <div class="table-wrap">
-                        <table class="leaderboard-table" id="lbTable">
-                            <thead>
-                                <tr>
-                                    <th data-key="rank">排行 ▲▼</th>
-                                    <th data-key="player">玩家ID ▲▼</th>
-                                    <th data-key="score">分数 ▲▼</th>
-                                    <th data-key="accuracy">命中率 ▲▼</th>
-                                    <th>判定（P/G/B/M）</th>
-                                    <th data-key="std_score">std_score ▲▼</th>
-                                    <th>时间</th>
-                                </tr>
-                            </thead>
-                            <tbody id="lbBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <p>© 2023 Phira信息查询中心 | 数据来源: phira.5wyxi.com</p>
         </div>
     </div>
 
     <script>
-        // ========== 排行榜使用的 token ==========
-        const TOKEN = 'IHbCbGoroEIPKxyP9imovKiG923gczyF';
-        // ========================================
-        
-        // 标签切换功能
-        function switchTab(tabIndex) {
-            // 隐藏所有标签内容和移除active类
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+        document.addEventListener('DOMContentLoaded', function() {
+            const groupNumberInput = document.getElementById('groupNumber');
+            const pasteBtn = document.getElementById('pasteBtn');
+            const queryBtn = document.getElementById('queryBtn');
+            const clipboardInfo = document.getElementById('clipboardInfo');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const resultSection = document.getElementById('resultSection');
+            const resultContent = document.getElementById('resultContent');
+            const saveBtn = document.getElementById('saveBtn');
             
-            // 显示选中的标签内容并添加active类
-            const tabIds = ['userTab', 'chartTab', 'leaderboardTab'];
-            document.getElementById(tabIds[tabIndex]).classList.add('active');
-            document.querySelectorAll('.tab')[tabIndex].classList.add('active');
+            let clipboardData = '';
             
-            // 聚焦到输入框
-            if (tabIndex === 0) {
-                document.getElementById('userId').focus();
-            } else if (tabIndex === 1) {
-                document.getElementById('chartId').focus();
-            } else {
-                document.getElementById('lbChartId').focus();
-            }
-        }
-        
-        // 新增函数：切换谱面信息选项卡
-        function switchChartTab(tabIndex) {
-            // 隐藏所有标签内容和移除active类
-            document.querySelectorAll('.chart-tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.chart-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // 显示选中的标签内容并添加active类
-            const tabIds = ['basicInfo', 'detailedInfo', 'fileInfo'];
-            document.getElementById(tabIds[tabIndex]).classList.add('active');
-            document.querySelectorAll('.chart-tab')[tabIndex].classList.add('active');
-        }
-        
-        // 用户信息查询功能
-        let currentUserData = null;
-        
-        async function getUserInfo() {
-            const userId = document.getElementById('userId').value.trim();
-            
-            if (!userId) {
-                showError('userError', '请输入用户ID');
-                return;
-            }
-            
-            showLoading('userLoading', true);
-            hideError('userError');
-            hideSuccess('userSuccess');
-            hideUser();
-            
-            try {
-                // 获取用户信息
-                const response = await fetch(`https://phira.5wyxi.com/user/${userId}`);
-                
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        throw new Error('用户不存在');
+            // 检查剪贴板内容
+            async function checkClipboard() {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (/^\d{5,12}$/.test(text.trim())) {
+                        clipboardData = text.trim();
+                        pasteBtn.disabled = false;
+                        clipboardInfo.textContent = `剪贴板检测到QQ群号: ${clipboardData}`;
+                        clipboardInfo.style.display = 'block';
                     } else {
-                        throw new Error('网络错误: ' + response.status);
+                        clipboardData = '';
+                        pasteBtn.disabled = true;
+                        clipboardInfo.style.display = 'none';
                     }
+                } catch (err) {
+                    console.log('无法读取剪贴板:', err);
+                    pasteBtn.disabled = true;
+                    clipboardInfo.style.display = 'none';
+                }
+            }
+            
+            // 粘贴剪贴板内容
+            pasteBtn.addEventListener('click', function() {
+                if (clipboardData) {
+                    groupNumberInput.value = clipboardData;
+                }
+            });
+            
+            // 定期检查剪贴板
+            setInterval(checkClipboard, 1000);
+            checkClipboard();
+            
+            // 查询群信息
+            queryBtn.addEventListener('click', function() {
+                const groupNumber = groupNumberInput.value.trim();
+                
+                if (!groupNumber) {
+                    showError('请输入QQ群号');
+                    return;
                 }
                 
-                const userData = await response.json();
-                currentUserData = userData;
+                if (!/^\d{5,12}$/.test(groupNumber)) {
+                    showError('请输入有效的QQ群号（5-12位数字）');
+                    return;
+                }
                 
-                // 显示用户信息
-                displayUserInfo(userData);
+                queryGroupInfo(groupNumber);
+            });
+            
+            // 按Enter键查询
+            groupNumberInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    queryBtn.click();
+                }
+            });
+            
+            // 显示错误信息
+            function showError(message) {
+                error.textContent = message;
+                error.style.display = 'block';
+                resultSection.style.display = 'none';
+                loading.style.display = 'none';
                 
-                showLoading('userLoading', false);
-                showUser();
-                showSuccess('userSuccess', '用户信息查询成功！');
-                
-            } catch (error) {
-                showLoading('userLoading', false);
-                showError('userError', '查询失败: ' + error.message);
+                setTimeout(() => {
+                    error.style.display = 'none';
+                }, 5000);
             }
-        }
-
-        function displayUserInfo(user) {
-            const userContainer = document.getElementById('userContainer');
             
-            // 格式化日期
-            const formatDate = (dateString) => {
-                const date = new Date(dateString);
-                const options = { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                };
-                return date.toLocaleDateString('zh-CN', options);
-            };
-            
-            // 计算账号年龄（天）
-            const calculateAccountAge = (joinDate) => {
-                const join = new Date(joinDate);
-                const now = new Date();
-                const diffTime = Math.abs(now - join);
-                return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            };
-            
-            const accountAge = calculateAccountAge(user.joined);
-            
-            userContainer.innerHTML = `
-                <div class="user-card">
-                    <div class="user-header">
-                        <div class="user-name">${user.name}</div>
-                        <div class="user-id">用户ID: ${user.id}</div>
-                        <div class="user-badges">
-                            <span class="badge">RKS: ${user.rks.toFixed(4)}</span>
-                            <span class="badge">EXP: ${user.exp}</span>
-                            ${user.roles > 0 ? '<span class="badge">特殊权限</span>' : ''}
-                        </div>
-                    </div>
+            // 查询群信息
+            async function queryGroupInfo(groupNumber) {
+                loading.style.display = 'block';
+                error.style.display = 'none';
+                resultSection.style.display = 'none';
+                queryBtn.disabled = true;
+                
+                try {
+                    const response = await fetch(`https://api.xiaoy.asia/api/v1/?name=qq_group_info&group=${groupNumber}`);
                     
-                    <div class="user-content">
-                        <div class="user-stats">
-                            <div class="stat-card">
-                                <div class="stat-value">${user.follower_count}</div>
-                                <div class="stat-label">粉丝数量</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">${user.following_count}</div>
-                                <div class="stat-label">关注数量</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">${accountAge}</div>
-                                <div class="stat-label">账号年龄(天)</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">${user.following ? '是' : '否'}</div>
-                                <div class="stat-label">已关注你</div>
-                            </div>
-                        </div>
-                        
-                        <div class="user-details">
-                            <div class="detail-item">
-                                <span class="detail-label"><i class="fas fa-globe"></i> 语言偏好</span>
-                                <span class="detail-value">${user.language || '未设置'}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label"><i class="fas fa-calendar-plus"></i> 加入时间</span>
-                                <span class="detail-value">${formatDate(user.joined)}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label"><i class="fas fa-clock"></i> 最后登录</span>
-                                <span class="detail-value">${formatDate(user.last_login)}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label"><i class="fas fa-shield-alt"></i> 账号状态</span>
-                                <span class="detail-value">
-                                    <span class="${user.banned ? 'status-banned' : 'status-normal'}">
-                                        ${user.banned ? '已封禁' : '正常'}
-                                    </span>
-                                    ${user.login_banned ? ' (登录受限)' : ''}
-                                </span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label"><i class="fas fa-user-tag"></i> 用户角色</span>
-                                <span class="detail-value">${getRoleName(user.roles)}</span>
-                            </div>
-                            ${user.bio ? `
-                            <div class="detail-item">
-                                <span class="detail-label"><i class="fas fa-quote-left"></i> 个人简介</span>
-                                <span class="detail-value">${user.bio}</span>
-                            </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function getRoleName(roleCode) {
-            const roles = {
-                0: "普通用户",
-                1: "管理员",
-                2: "开发者",
-                3: "社区管理",
-                4: "审核员",
-                5: "内容创作者"
-            };
-            return roles[roleCode] || `未知角色 (${roleCode})`;
-        }
-        
-        // 谱面信息查询功能
-        let currentChartData = null;
-        let currentImageUrl = null;
-
-        async function getChartImage() {
-            const chartId = document.getElementById('chartId').value.trim();
-            
-            if (!chartId) {
-                showError('chartError', '请输入有效的谱面ID');
-                return;
-            }
-            
-            showLoading('chartLoading', true);
-            hideError('chartError');
-            hideSuccess('chartSuccess');
-            hideChart();
-            hideDownload();
-            
-            // 清空之前的内容
-            document.getElementById('basicInfo').innerHTML = '';
-            document.getElementById('detailedInfo').innerHTML = '';
-            document.getElementById('fileInfo').innerHTML = '';
-            
-            try {
-                const response = await fetch(`https://phira.5wyxi.com/chart/${chartId}`);
-                
-                if (!response.ok) {
-                    throw new Error(`请求失败: ${response.status}`);
-                }
-                
-                const chartData = await response.json();
-                currentChartData = chartData;
-                
-                if (!chartData.illustration) {
-                    throw new Error('该谱面没有背景图片');
-                }
-                
-                const img = document.getElementById('chartImage');
-                img.src = chartData.illustration;
-                currentImageUrl = chartData.illustration;
-                
-                displayChartInfo(chartData);
-                
-                img.onload = function() {
-                    showLoading('chartLoading', false);
-                    showChart();
-                    showDownload();
-                    showSuccess('chartSuccess', '谱面信息加载成功！点击下载按钮保存图片');
-                };
-                
-                img.onerror = function() {
-                    throw new Error('图片加载失败');
-                };
-                
-            } catch (error) {
-                showLoading('chartLoading', false);
-                showError('chartError', '获取失败: ' + error.message);
-            }
-        }
-
-        function downloadImage() {
-            if (!currentImageUrl) {
-                showError('chartError', '没有可下载的图片');
-                return;
-            }
-            
-            try {
-                // 创建下载链接
-                const link = document.createElement('a');
-                link.href = currentImageUrl;
-                
-                // 生成文件名
-                const chartName = currentChartData?.name ? currentChartData.name.replace(/[^\w\u4e00-\u9fa5]/g, '_') : 'chart';
-                const fileName = `phira_${chartName}_${currentChartData?.id || 'unknown'}.jpg`;
-                
-                link.download = fileName;
-                link.target = '_blank';
-                
-                // 模拟点击下载
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                // 显示下载成功提示
-                showSuccess('chartSuccess', '✅ 下载成功！图片已保存到相册');
-                
-            } catch (error) {
-                showError('chartError', '下载失败: ' + error.message);
-            }
-        }
-
-        function decodeCharter(charter) {
-            if (!charter) return '未知';
-            try {
-                return atob(charter);
-            } catch {
-                return charter;
-            }
-        }
-        
-        // 修改displayChartInfo函数以显示更多信息
-        function displayChartInfo(data) {
-            // 格式化日期函数
-            const formatDate = (dateString) => {
-                if (!dateString) return '未知';
-                const date = new Date(dateString);
-                const options = { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                };
-                return date.toLocaleDateString('zh-CN', options);
-            };
-            
-            // 生成星级评分显示
-            const renderStars = (rating) => {
-                if (!rating) return '暂无评分';
-                const fullStars = Math.floor(rating * 5);
-                const halfStar = rating * 5 - fullStars >= 0.5;
-                let stars = '';
-                
-                for (let i = 0; i < fullStars; i++) {
-                    stars += '<i class="fas fa-star"></i>';
-                }
-                
-                if (halfStar) {
-                    stars += '<i class="fas fa-star-half-alt"></i>';
-                }
-                
-                const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-                for (let i = 0; i < emptyStars; i++) {
-                    stars += '<i class="far fa-star"></i>';
-                }
-                
-                return stars;
-            };
-            
-            // 基本信息选项卡
-            document.getElementById('basicInfo').innerHTML = `
-                <h3>${data.name || '未知谱面'}</h3>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <div class="info-label">谱面ID</div>
-                        <div class="info-value">${data.id || '未知'}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">难度等级</div>
-                        <div class="info-value">${data.level || '未知'}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">难度数值</div>
-                        <div class="info-value">${data.difficulty ? data.difficulty.toFixed(2) : '未知'}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">作曲家</div>
-                        <div class="info-value">${data.composer || '未知'}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">谱师</div>
-                        <div class="info-value">${decodeCharter(data.charter)}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">插画师</div>
-                        <div class="info-value">${data.illustrator || '未知'}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">上传者ID</div>
-                        <div class="info-value">${data.uploader || '未知'}</div>
-                    </div>
-                </div>
-                
-                ${data.tags && data.tags.length > 0 ? `
-                <div style="margin-top: 15px;">
-                    <div class="info-label">标签</div>
-                    <div class="tags-container">
-                        ${data.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                    </div>
-                </div>
-                ` : ''}
-                
-                <div class="rating-stars">
-                    <div class="stars">${renderStars(data.rating)}</div>
-                    <div class="rating-value">${data.rating ? (data.rating * 10).toFixed(1) + '/10' : '暂无评分'}</div>
-                    <div class="rating-count">${data.ratingCount ? `(${data.ratingCount}人评分)` : ''}</div>
-                </div>
-                
-                <div class="status-indicators">
-                    <div class="status-item">
-                        <i class="fas fa-check-circle ${data.ranked ? 'status-true' : 'status-false'}"></i>
-                        <span>已评级: ${data.ranked ? '是' : '否'}</span>
-                    </div>
-                    <div class="status-item">
-                        <i class="fas fa-check-circle ${data.reviewed ? 'status-true' : 'status-false'}"></i>
-                        <span>已审核: ${data.reviewed ? '是' : '否'}</span>
-                    </div>
-                    <div class="status-item">
-                        <i class="fas fa-check-circle ${data.stable ? 'status-true' : 'status-false'}"></i>
-                        <span>稳定版: ${data.stable ? '是' : '否'}</span>
-                    </div>
-                </div>
-                
-                ${data.description ? `
-                <div>
-                    <div class="info-label">谱面描述</div>
-                    <div class="description">${data.description}</div>
-                </div>
-                ` : ''}
-            `;
-            
-            // 详细信息选项卡
-            document.getElementById('detailedInfo').innerHTML = `
-                <h3>详细数据</h3>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <div class="info-label">谱面ID</div>
-                        <div class="info-value">${data.id || '未知'}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">难度数值</div>
-                        <div class="info-value">${data.difficulty ? data.difficulty.toFixed(6) : '未知'}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">评级</div>
-                        <div class="info-value">${data.rating ? data.rating.toFixed(6) : '未知'}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">评分人数</div>
-                        <div class="info-value">${data.ratingCount || '0'}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">稳定版请求</div>
-                        <div class="info-value">${data.stableRequest ? '是' : '否'}</div>
-                    </div>
-                </div>
-                
-                <div class="time-info">
-                    <div class="time-item">
-                        <div class="time-label">创建时间</div>
-                        <div class="time-value">${formatDate(data.created)}</div>
-                    </div>
-                    <div class="time-item">
-                        <div class="time-label">更新时间</div>
-                        <div class="time-value">${formatDate(data.updated)}</div>
-                    </div>
-                    <div class="time-item">
-                        <div class="time-label">谱面更新时间</div>
-                        <div class="time-value">${formatDate(data.chartUpdated)}</div>
-                    </div>
-                </div>
-            `;
-            
-            // 文件信息选项卡
-            document.getElementById('fileInfo').innerHTML = `
-                <h3>文件信息</h3>
-                <div class="file-links">
-                    ${data.illustration ? `
-                    <a href="${data.illustration}" target="_blank" class="file-link">
-                        <i class="fas fa-image"></i>
-                        <span>背景图片</span>
-                    </a>
-                    ` : ''}
-                    
-                    ${data.preview ? `
-                    <a href="${data.preview}" target="_blank" class="file-link">
-                        <i class="fas fa-play-circle"></i>
-                        <span>预览音频</span>
-                    </a>
-                    ` : ''}
-                    
-                    ${data.file ? `
-                    <a href="${data.file}" target="_blank" class="file-link">
-                        <i class="fas fa-file-alt"></i>
-                        <span>谱面文件</span>
-                    </a>
-                    ` : ''}
-                </div>
-                
-                <div class="info-grid">
-                    <div class="info-item">
-                        <div class="info-label">背景图片URL</div>
-                        <div class="info-value" style="word-break: break-all; font-size: 0.9em;">
-                            ${data.illustration || '无'}
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">预览音频URL</div>
-                        <div class="info-value" style="word-break: break-all; font-size: 0.9em;">
-                            ${data.preview || '无'}
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">谱面文件URL</div>
-                        <div class="info-value" style="word-break: break-all; font-size: 0.9em;">
-                            ${data.file || '无'}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // 排行榜功能
-        let lbData = [];
-        let showTopOnly = false; // 初始状态为显示全部
-        let sortKey = 'rank';
-        let sortDir = 1; // 1 asc, -1 desc
-
-        async function fetchLeaderboard() {
-            clearLbError();
-            document.getElementById('lbBody').innerHTML = '';
-            hideLeaderboard();
-            
-            const id = document.getElementById('lbChartId').value.trim();
-            if (!id) { 
-                showLbError('请输入谱面ID'); 
-                return; 
-            }
-
-            setLbStatus('加载中… 请求榜单数据中');
-            try {
-                const url = `https://phira.5wyxi.com/record/list15/${encodeURIComponent(id)}?std=false`;
-                const res = await fetch(url, { 
-                    method: 'GET', 
-                    headers: { 
-                        'Accept': '*/*', 
-                        'Authorization': 'Bearer ' + TOKEN 
+                    if (!response.ok) {
+                        throw new Error(`HTTP错误: ${response.status}`);
                     }
-                });
-                
-                if (!res.ok) {
-                    throw new Error('请求失败: ' + res.status + ' ' + res.statusText);
+                    
+                    const data = await response.json();
+                    
+                    if (data.ec !== 0 || data.errcode !== 0) {
+                        throw new Error(data.em || '未知错误');
+                    }
+                    
+                    displayGroupInfo(data);
+                    
+                } catch (err) {
+                    showError(`查询失败: ${err.message}`);
+                } finally {
+                    loading.style.display = 'none';
+                    queryBtn.disabled = false;
                 }
-                
-                const j = await res.json();
-                if (!Array.isArray(j)) { 
-                    throw new Error('返回数据格式异常'); 
-                }
-                
-                lbData = j.slice(); // clone
-                setLbStatus('加载完成，准备显示数据');
-                renderLeaderboard();
-            } catch (e) {
-                showLbError('加载失败: ' + e.message);
-                setLbStatus('加载失败');
-                lbData = [];
-                document.getElementById('lbSummary').textContent = '—';
-            }
-        }
-
-        function renderLeaderboard() {
-            if (!Array.isArray(lbData) || lbData.length === 0) {
-                setLbStatus('没有数据可显示');
-                hideLeaderboard();
-                document.getElementById('lbSummary').textContent = '共 0 条';
-                return;
-            }
-
-            // filter
-            const q = (document.getElementById('lbFilter').value || '').trim().toLowerCase();
-            let rows = lbData.filter(r => {
-                if (!q) return true;
-                return String(r.player).includes(q) || String(r.score).includes(q);
-            });
-
-            // sort
-            rows.sort((a, b) => {
-                const av = a[sortKey] ?? 0;
-                const bv = b[sortKey] ?? 0;
-                if (typeof av === 'string' || typeof bv === 'string') {
-                    return (String(av) > String(bv) ? 1 : -1) * sortDir;
-                }
-                return (av - bv) * sortDir;
-            });
-
-            const total = rows.length;
-            const shown = showTopOnly ? rows.slice(0, 10) : rows;
-
-            document.getElementById('lbBody').innerHTML = shown.map(r => {
-                const acc = formatAcc(r.accuracy);
-                const time = formatTime(r.time);
-                const p = r.player || '-';
-                const score = r.score != null ? r.score.toLocaleString() : '-';
-                const judges = `${r.perfect ?? '-'} / ${r.good ?? '-'} / ${r.bad ?? '-'} / ${r.miss ?? '-'}`;
-                const stdscore = r.std_score != null ? Number(r.std_score).toFixed(2) : '-';
-                return `
-                    <tr>
-                        <td>${r.rank ?? '-'}</td>
-                        <td>${p}</td>
-                        <td style="font-weight:700">${score}</td>
-                        <td>${acc}</td>
-                        <td>${judges}</td>
-                        <td>${stdscore}</td>
-                        <td class="muted-text">${time}</td>
-                    </tr>
-                `;
-            }).join('');
-
-            showLeaderboard();
-            document.getElementById('lbSummary').textContent = `显示 ${shown.length}/${total} 条（总 ${lbData.length} 条）`;
-            setLbStatus('显示中');
-        }
-
-        function formatAcc(a) {
-            return a == null ? '-' : (a * 100).toFixed(4) + '%';
-        }
-
-        function formatTime(t) {
-            try { 
-                return t ? new Date(t).toLocaleString() : '-'; 
-            } catch { 
-                return t; 
-            }
-        }
-
-        function exportCSV() {
-            if (!lbData || lbData.length === 0) { 
-                alert('暂无数据可导出'); 
-                return; 
             }
             
-            const header = ['rank','player','score','accuracy','perfect','good','bad','miss','mods','full_combo','time','std','std_score'];
-            const rows = lbData.map(r => header.map(k => JSON.stringify(r[k] == null ? '' : String(r[k]))).join(','));
-            const csv = [header.join(','), ...rows].join('\n');
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `phira_lb_${document.getElementById('lbChartId').value}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        // 辅助函数
-        function showLoading(id, show) {
-            document.getElementById(id).style.display = show ? 'block' : 'none';
-        }
-        
-        function showError(id, message) {
-            const el = document.getElementById(id);
-            el.textContent = message;
-            el.style.display = 'block';
-        }
-        
-        function hideError(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-        
-        function showSuccess(id, message) {
-            const el = document.getElementById(id);
-            el.textContent = message;
-            el.style.display = 'block';
-        }
-        
-        function hideSuccess(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-        
-        function showUser() {
-            document.getElementById('userContainer').style.display = 'block';
-        }
-        
-        function hideUser() {
-            document.getElementById('userContainer').style.display = 'none';
-        }
-        
-        function showChart() {
-            document.getElementById('chartContainer').style.display = 'block';
-        }
-        
-        function hideChart() {
-            document.getElementById('chartContainer').style.display = 'none';
-        }
-        
-        function showDownload() {
-            document.getElementById('downloadContainer').style.display = 'block';
-        }
-        
-        function hideDownload() {
-            document.getElementById('downloadContainer').style.display = 'none';
-        }
-        
-        function showLeaderboard() {
-            document.getElementById('leaderboardContainer').style.display = 'block';
-        }
-        
-        function hideLeaderboard() {
-            document.getElementById('leaderboardContainer').style.display = 'none';
-        }
-        
-        function showLbError(msg) {
-            const el = document.getElementById('lbError');
-            el.textContent = msg;
-            el.style.display = 'block';
-        }
-        
-        function clearLbError() {
-            document.getElementById('lbError').style.display = 'none';
-        }
-        
-        function setLbStatus(msg) {
-            document.getElementById('lbStatus').textContent = msg;
-        }
-
-        // 初始化排行榜相关事件
-        document.addEventListener('DOMContentLoaded', () => {
-            // 排行榜排序
-            document.querySelectorAll('#lbTable thead th[data-key]').forEach(th => {
-                th.addEventListener('click', () => {
-                    const key = th.dataset.key;
-                    if (sortKey === key) {
-                        sortDir *= -1;
+            // 显示群信息
+            function displayGroupInfo(data) {
+                resultContent.innerHTML = '';
+                
+                // 基本信息
+                const basicInfo = createSection('📋 基本信息');
+                addInfoRow(basicInfo, '群号', data.gc || '未知');
+                addInfoRow(basicInfo, '群名称', cleanText(data.gName) || '未知');
+                addInfoRow(basicInfo, '群主QQ', data.gOwner || '未知');
+                
+                const ownerQQ = String(data.gOwner || '');
+                const ownerName = cleanText(data.ns?.[ownerQQ]) || '未知';
+                addInfoRow(basicInfo, '群主昵称', ownerName);
+                
+                const currentMembers = data.gMemNum || 0;
+                const maxMembers = data.gMaxMem || 0;
+                const membershipRate = maxMembers > 0 ? (currentMembers / maxMembers * 100).toFixed(1) : 0;
+                addInfoRow(basicInfo, '群人数', `${currentMembers}/${maxMembers} (${membershipRate}% 满员)`);
+                
+                addInfoRow(basicInfo, '群等级', data.gLevel || '未知');
+                addInfoRow(basicInfo, '群分类', cleanText(data.class) || '无分类');
+                
+                // 群介绍
+                const introSection = createSection('📝 群介绍');
+                const gintro = cleanText(data.gIntro);
+                addInfoRow(introSection, '', gintro && gintro !== '无' ? gintro : '无介绍', true);
+                
+                // 群公告
+                const boardSection = createSection('📢 群公告');
+                const gboard = cleanText(data.gBoard);
+                addInfoRow(boardSection, '', gboard && gboard !== '无' ? gboard : '无公告', true);
+                
+                // 时间信息
+                const timeSection = createSection('⏰ 时间信息');
+                const createTime = data.gCrtTime;
+                if (createTime) {
+                    const dt = new Date(createTime * 1000);
+                    const createTimeStr = `${dt.getFullYear()}年${(dt.getMonth()+1).toString().padStart(2, '0')}月${dt.getDate().toString().padStart(2, '0')}日 ${dt.getHours().toString().padStart(2, '0')}:${dt.getMinutes().toString().padStart(2, '0')}:${dt.getSeconds().toString().padStart(2, '0')}`;
+                    addInfoRow(timeSection, '创建时间', createTimeStr);
+                    
+                    const now = new Date();
+                    const existTime = Math.floor((now - dt) / (1000 * 60 * 60 * 24));
+                    addInfoRow(timeSection, '已存在', `${existTime} 天`);
+                } else {
+                    addInfoRow(timeSection, '创建时间', '未知');
+                }
+                
+                // 群标签
+                const tagsSection = createSection('🏷️ 群标签');
+                const tags = data.tags;
+                if (tags && tags !== '') {
+                    if (Array.isArray(tags)) {
+                        const tagList = tags.map(tag => cleanText(tag.tag)).filter(tag => tag);
+                        addInfoRow(tagsSection, '', tagList.length > 0 ? tagList.join(', ') : '无标签', true);
                     } else {
-                        sortKey = key;
-                        sortDir = 1;
+                        addInfoRow(tagsSection, '', cleanText(tags), true);
                     }
-                    renderLeaderboard();
-                });
-            });
+                } else {
+                    addInfoRow(tagsSection, '', '无标签', true);
+                }
+                
+                // 管理员信息
+                const adminSection = createSection('👥 管理员信息');
+                const admins = data.gAdmins || [];
+                addInfoRow(adminSection, '管理员数量', admins.length);
+                
+                if (admins.length > 0) {
+                    const adminList = document.createElement('div');
+                    adminList.innerHTML = '<div style="margin-top: 8px; font-weight: 500;">前15位管理员列表:</div>';
+                    
+                    admins.slice(0, 15).forEach((adminQQ, index) => {
+                        const adminName = cleanText(data.ns?.[String(adminQQ)]) || '未知';
+                        const adminItem = document.createElement('div');
+                        adminItem.style.marginTop = '5px';
+                        adminItem.textContent = `  ${(index+1).toString().padStart(2, ' ')}. QQ: ${adminQQ} - 昵称: ${adminName}`;
+                        adminList.appendChild(adminItem);
+                    });
+                    
+                    if (admins.length > 15) {
+                        const moreInfo = document.createElement('div');
+                        moreInfo.style.marginTop = '5px';
+                        moreInfo.textContent = `  ... 还有${admins.length - 15}个管理员`;
+                        adminList.appendChild(moreInfo);
+                    }
+                    
+                    adminSection.appendChild(adminList);
+                } else {
+                    addInfoRow(adminSection, '', '无管理员信息', true);
+                }
+                
+                // 其他信息
+                const otherSection = createSection('🔧 其他信息');
+                addInfoRow(otherSection, '群类型', data.gtype || '未知');
+                addInfoRow(otherSection, '认证等级', data.ac_grade || '未知');
+                addInfoRow(otherSection, '活跃成员数', data.ac_num || '未知');
+                addInfoRow(otherSection, '特殊分类', data.gSpeClass || '未知');
+                addInfoRow(otherSection, '分类ID', data.classID || '未知');
+                addInfoRow(otherSection, '标志位', data.flag || '未知');
+                addInfoRow(otherSection, '群头像配置', data.conf_mGFace || '未知');
+                addInfoRow(otherSection, '群名称配置', data.conf_mGName || '未知');
+                
+                resultSection.style.display = 'block';
+                
+                // 保存数据功能
+                saveBtn.onclick = function() {
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `qq_group_${data.gc || 'unknown'}_data.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                };
+            }
             
-            // 排行榜过滤
-            document.getElementById('lbFilter').addEventListener('input', renderLeaderboard);
+            // 创建信息区块
+            function createSection(title) {
+                const section = document.createElement('div');
+                section.className = 'section';
+                
+                const titleEl = document.createElement('div');
+                titleEl.className = 'section-title';
+                titleEl.textContent = title;
+                
+                section.appendChild(titleEl);
+                resultContent.appendChild(section);
+                
+                return section;
+            }
             
-            // 排行榜切换显示模式
-            document.getElementById('toggleTop').addEventListener('click', () => {
-                showTopOnly = !showTopOnly;
-                document.getElementById('toggleTop').textContent = showTopOnly ? '显示全部' : '只看 Top 10';
-                renderLeaderboard();
-            });
+            // 添加信息行
+            function addInfoRow(section, label, value, fullWidth = false) {
+                const row = document.createElement('div');
+                row.className = 'info-row';
+                
+                if (fullWidth) {
+                    const valueEl = document.createElement('div');
+                    valueEl.className = 'info-value';
+                    valueEl.style.width = '100%';
+                    valueEl.textContent = value;
+                    row.appendChild(valueEl);
+                } else {
+                    const labelEl = document.createElement('div');
+                    labelEl.className = 'info-label';
+                    labelEl.textContent = label;
+                    
+                    const valueEl = document.createElement('div');
+                    valueEl.className = 'info-value';
+                    valueEl.textContent = value;
+                    
+                    row.appendChild(labelEl);
+                    row.appendChild(valueEl);
+                }
+                
+                section.appendChild(row);
+            }
             
-            // 按Enter键触发查询
-            document.getElementById('lbChartId').addEventListener('keypress', e => {
-                if (e.key === 'Enter') fetchLeaderboard();
-            });
-            
-            // 初始化排行榜切换按钮文本
-            document.getElementById('toggleTop').textContent = showTopOnly ? '显示全部' : '只看 Top 10';
+            // 清理文本
+            function cleanText(text) {
+                if (!text || text === '') return '无';
+                
+                // 处理HTML实体
+                text = text.replace(/&nbsp;/g, ' ').replace(/&#10;/g, '\n');
+                
+                // 处理其他HTML实体
+                const textarea = document.createElement('textarea');
+                textarea.innerHTML = text;
+                return textarea.value;
+            }
         });
     </script>
 </body>
